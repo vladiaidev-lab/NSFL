@@ -373,7 +373,7 @@ if __name__ == '__main__':
     is_faiss = args.is_faiss
     query_debug = False
     query_debug_id = '1'
-    fl = FuzzyLogic(pylogics = False, type=args.fuzzy_type.upper(), sig_gate=bool(args.sig_gate))
+    fl = FuzzyLogic(type=args.fuzzy_type.upper(), sig_gate=bool(args.sig_gate))
 
     questions = {}
     with open(args.queries_path) as json_data:

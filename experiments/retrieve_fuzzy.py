@@ -25,7 +25,6 @@ from fuzzy_logic import FuzzyLogic, NumpyEncoder, create_geometric_logic_vector
 from objective_hnsw import ObjectiveHNSW
 from score_dump import ScoreDumper
 import pickle
-import openvino as ov
 
 
 # ── Initialisation ──────────────────────────────────────────────────────────
@@ -156,11 +155,10 @@ def parse_args():
 
 
 
-class OpenVINOSentenceEncoder:
+class SentenceEncoder:
     """
-    Drop-in replacement for SentenceTransformer that runs on Intel GPU (XPU)
-    via OpenVINO using optimum-intel. Falls back to SentenceTransformer on
-    other devices, or if the OpenVINO export fails.
+    Thin wrapper around SentenceTransformer that adds a string-like interface
+    (so "Qwen" in encoder works).
     """
 
     def __init__(self, model_name_or_path: str, device: torch.device,
@@ -168,23 +166,14 @@ class OpenVINOSentenceEncoder:
         self.model_name       = model_name_or_path
         self.device           = device
         self.trust_remote_code = trust_remote_code
-        self.use_openvino     = (device == torch.device("xpu"))
-        self._use_optimum     = False
 
-        # print(f"\n[OpenVINOSentenceEncoder] Initialising '{model_name_or_path}'.  Requested torch device : {device}.  Use OpenVINO path      : {self.use_openvino}")
-
-        if self.use_openvino:
-            self._init_openvino(model_name_or_path)
-        else:
-            # print(f"  Loading via SentenceTransformer on {device}")
-            self.model = SentenceTransformer(
-                model_name_or_path,
-                device=str(device),
-                model_kwargs=model_kwargs or {},
-                trust_remote_code=trust_remote_code,
-            )
-            self.max_seq_length = self.model.max_seq_length
-            # print(f"  [OK] SentenceTransformer loaded on {device}")
+        self.model = SentenceTransformer(
+            model_name_or_path,
+            device=str(device),
+            model_kwargs=model_kwargs or {},
+            trust_remote_code=trust_remote_code,
+        )
+        self.max_seq_length = self.model.max_seq_length
 
     # ------------------------------------------------------------------ #
     #  String-like interface (so "Qwen" in encoder works)
@@ -196,170 +185,13 @@ class OpenVINOSentenceEncoder:
         return self.model_name
 
     def __repr__(self) -> str:
-        device_str = self.ov_device if self.use_openvino else str(self.device)
-        return f"OpenVINOSentenceEncoder(model='{self.model_name}', device='{device_str}')"
-
-    # ------------------------------------------------------------------ #
-    #  OpenVINO device discovery
-    # ------------------------------------------------------------------ #
-    @staticmethod
-    def _pick_ov_device(core) -> str:
-        available = core.available_devices
-        str = f"\n  [OpenVINO] Available devices : {available}"
-        for dev in available:
-            try:
-                full_name = core.get_property(dev, "FULL_DEVICE_NAME")
-                str += f"    {dev:12s} -> {full_name}"
-            except Exception:
-                str += f"    {dev:12s} -> (name unavailable)"
-
-        gpu_devices = [d for d in available if d.startswith("GPU")]
-        if gpu_devices:
-            chosen = gpu_devices[0]
-            str += f"\n  [OpenVINO] Selecting GPU device : {chosen}"
-            print(str)
-            return chosen
-
-        print("  [OpenVINO] No GPU found — falling back to CPU")
-        return "CPU"
-
-
-    # ------------------------------------------------------------------ #
-    #  OpenVINO init via optimum-intel
-    # ------------------------------------------------------------------ #
-    def _init_openvino(self, model_name_or_path: str):
-        import openvino as ov
-        core = ov.Core()
-        self.ov_device = self._pick_ov_device(core)
-
-        cache_dir = os.path.join(os.path.expanduser("~"), ".cache", "ov_sentence_transformers")
-        safe_name = model_name_or_path.replace("/", "_").replace("\\", "_")
-        ov_model_dir = os.path.join(cache_dir, safe_name)
-
-        try:
-            from optimum.intel import OVModelForFeatureExtraction
-            from optimum.exporters.onnx import OnnxConfig
-            from optimum.exporters.onnx.model_configs import BertOnnxConfig
-            from transformers import AutoTokenizer, AutoConfig
-            from collections import OrderedDict
-
-            # Custom export config for nomic_bert and other unsupported architectures.
-            # We subclass BertOnnxConfig which covers any BERT-like model with
-            # input_ids + attention_mask inputs and last_hidden_state output.
-            class NomicBertOnnxConfig(BertOnnxConfig):
-                @property
-                def inputs(self) -> dict[str, dict[int, str]]:
-                    return OrderedDict([
-                        ("input_ids",      {0: "batch_size", 1: "sequence_length"}),
-                        ("attention_mask", {0: "batch_size", 1: "sequence_length"}),
-                    ])
-
-                @property
-                def outputs(self) -> dict[str, dict[int, str]]:
-                    return OrderedDict([
-                        ("last_hidden_state", {0: "batch_size", 1: "sequence_length"}),
-                    ])
-
-            config = AutoConfig.from_pretrained(
-                model_name_or_path, trust_remote_code=self.trust_remote_code
-            )
-            custom_export_configs = {"model": NomicBertOnnxConfig(config)}
-
-            if os.path.exists(ov_model_dir):
-                print(f"  [OpenVINO] Loading cached OV model from {ov_model_dir}")
-                self.ov_model = OVModelForFeatureExtraction.from_pretrained(
-                    ov_model_dir,
-                    device=self.ov_device,
-                    trust_remote_code=self.trust_remote_code,
-                )
-            else:
-                print(f"  [OpenVINO] Exporting via optimum-intel (one-time, may take a few minutes) ...")
-                os.makedirs(ov_model_dir, exist_ok=True)
-                self.ov_model = OVModelForFeatureExtraction.from_pretrained(
-                    model_name_or_path,
-                    export=True,
-                    device=self.ov_device,
-                    trust_remote_code=self.trust_remote_code,
-                    custom_export_configs=custom_export_configs,
-                )
-                self.ov_model.save_pretrained(ov_model_dir)
-                print(f"  [OpenVINO] OV model saved to {ov_model_dir}")
-
-            self.tokenizer = AutoTokenizer.from_pretrained(
-                model_name_or_path, trust_remote_code=self.trust_remote_code
-            )
-            self.max_seq_length = getattr(self.ov_model.config, "max_position_embeddings", 512)
-            self._use_optimum = True
-
-            try:
-                runtime_device = self.ov_model.request.get_property("EXECUTION_DEVICES")
-                # print(f"  [OpenVINO] Runtime execution device(s): {runtime_device}")
-            except Exception:
-                pass
-
-            # print(f"  [OpenVINO] Init complete via optimum-intel on: {self.ov_device}\n")
-
-        except Exception as e:
-            # print(f"\n  [OpenVINO] optimum-intel export/load failed: {e}")
-            # print(f"  [OpenVINO] Falling back to SentenceTransformer on CPU\n")
-            self._use_optimum = False
-            self.ov_device = "CPU (fallback)"
-            self.model = SentenceTransformer(
-                model_name_or_path, device="cpu",
-                trust_remote_code=self.trust_remote_code,
-            )
-            self.max_seq_length = self.model.max_seq_length
-
-
-            
-    # ------------------------------------------------------------------ #
-    #  Tokenisation
-    # ------------------------------------------------------------------ #
-    def _tokenize(self, texts: list[str]) -> dict:
-        encoded = self.tokenizer(
-            texts,
-            padding=True,
-            truncation=True,
-            max_length=self.max_seq_length,
-            return_tensors="np",
-        )
-        return {
-            "input_ids":      encoded["input_ids"].astype(np.int64),
-            "attention_mask": encoded["attention_mask"].astype(np.int64),
-        }
+        return f"SentenceEncoder(model='{self.model_name}', device='{self.device}')"
 
     # ------------------------------------------------------------------ #
     #  Public API — matches SentenceTransformer.encode()
     # ------------------------------------------------------------------ #
     def encode(self, sentences: list[str], batch_size: int = 32, **kwargs) -> np.ndarray:
-        # Non-XPU: plain SentenceTransformer on CUDA/CPU
-        if not self.use_openvino:
-            return self.model.encode(sentences, batch_size=batch_size, **kwargs)
-
-        # XPU but optimum export failed: SentenceTransformer CPU fallback
-        if not self._use_optimum:
-            return self.model.encode(sentences, batch_size=batch_size, **kwargs)
-
-        # XPU + optimum: run on Intel GPU via OpenVINO
-        all_embeddings = []
-        for i, start in enumerate(range(0, len(sentences), batch_size)):
-            batch = sentences[start: start + batch_size]
-            inputs = self._tokenize(batch)
-
-            if i == 0:
-                print(f"  [OpenVINO] Running inference on {self.ov_device} "
-                      f"(batch {len(batch)}/{len(sentences)} sentences)")
-
-            torch_inputs = {k: torch.tensor(v) for k, v in inputs.items()}
-            outputs = self.ov_model(**torch_inputs)
-
-            token_embeddings = outputs.last_hidden_state.numpy()
-            mask = inputs["attention_mask"][..., np.newaxis].astype(np.float32)
-            pooled = (token_embeddings * mask).sum(1) / mask.sum(1).clip(min=1e-9)
-            norms  = np.linalg.norm(pooled, axis=-1, keepdims=True).clip(min=1e-12)
-            all_embeddings.append(pooled / norms)
-
-        return np.vstack(all_embeddings)
+        return self.model.encode(sentences, batch_size=batch_size, **kwargs)
     
 
 
@@ -733,7 +565,7 @@ def load_all_data(queries, is_encode_documents, saved_queries_path):
         model_kwargs = None
     
     # query_encoder = SentenceTransformer(args.query_encoder, trust_remote_code=True)
-    query_encoder = OpenVINOSentenceEncoder(args.query_encoder, device=device, model_kwargs=model_kwargs, trust_remote_code=True)
+    query_encoder = SentenceEncoder(args.query_encoder, device=device, model_kwargs=model_kwargs, trust_remote_code=True)
 
 
     #eval_qid2query, eval_qid2docids = get_fuzzy_evalset(queries, return_negatives=True, fuzzy=fuzzy)
@@ -888,7 +720,7 @@ if __name__ == '__main__':
     query_debug_id = '1'
 
 
-    fl = FuzzyLogic(pylogics = False, type=args.fuzzy_type.upper(), sig_gate=bool(args.sig_gate))
+    fl = FuzzyLogic(type=args.fuzzy_type.upper(), sig_gate=bool(args.sig_gate))
 
     questions = {}
     with open(args.queries_path) as json_data:

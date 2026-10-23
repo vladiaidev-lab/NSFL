@@ -14,14 +14,14 @@ Standard dense retrievers have no native mechanism for multi-atom logical constr
 
 ## What this repository contains
 
-Code for the NSFL operators and scoring, Spherical Query Optimization (SQO), and the evaluation drivers for QUEST, COCO-LOGIC and NevIR. `supplementary/` is the code package exactly as uploaded to OpenReview for review; `src/` and `experiments/` contain the same files regrouped (library modules vs. drivers) with no code changes. No dataset is redistributed.
+Code for the NSFL operators and scoring, Spherical Query Optimization (SQO), and the evaluation drivers for QUEST, COCO-LOGIC and NevIR. `supplementary/` is the code package exactly as uploaded to OpenReview for review; `src/` and `experiments/` contain the same files regrouped (library modules vs. drivers), with only unused code removed (see `docs/REPRODUCING.md`). No dataset is redistributed.
 
 ```
 .
 ├── README.md, LICENSE, CITATION.cff, requirements.txt
 ├── src/                 # operators and scoring (fuzzy_logic.py), SQO (objective_hnsw.py),
 │   │                    # score dumping, dataset loading, encoder wrappers
-│   ├── models/  classifiers/  utils/
+│   ├── models/  classifiers/
 ├── experiments/         # retrieval / evaluation drivers (retrieve_fuzzy*.py, evaluate*.py, ...)
 ├── supplementary/       # the OpenReview supplementary package, unmodified
 ├── data/README.md       # how to obtain the datasets
@@ -50,7 +50,7 @@ Expected: `overall` accuracy of 0.611 (baseline) and 0.717 (NSFL), as reported i
 
 ## Reproducing the paper's results
 
-The commands below are taken from the supplementary package (flags checked against each script's argument parser) and need the QUEST / COCO-LOGIC data (see Datasets) and, for the retrieval pipelines, additional dependencies described in [`docs/REPRODUCING.md`](docs/REPRODUCING.md). Run from the repository root with `PYTHONPATH=src`; the scripts expect a `logic_demo/` directory (layout in `supplementary/README.md` §3).
+The commands below are taken from the supplementary package (flags checked against each script's argument parser) and need the QUEST / COCO-LOGIC data (see Datasets); details in [`docs/REPRODUCING.md`](docs/REPRODUCING.md). Run from the repository root with `PYTHONPATH=src`; the scripts expect a `logic_demo/` directory (layout in `supplementary/README.md` §3).
 
 | Paper item | Command |
 |---|---|

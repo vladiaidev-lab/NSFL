@@ -4,12 +4,9 @@ import numpy as np
 from numpy import linalg as LA
 import sys
 #sys.path.insert(0, '<PATH_TO_REPO_ROOT>')
-from pylogics.parsers import parse_ltl 
-from pylogics.semantics.ltl import evaluate_ltl, reset_cache, print_cache, eval_cache
 from tqdm import tqdm
 import json
 from scipy.special import softmax
-from utils.query_builder import query_parser
 import torch.nn.functional as F
 import torch
 import math, statistics
@@ -127,24 +124,19 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
     
 class FuzzyLogic:
-    def __init__(self,  pylogics = True, type="NSFL", sig_gate=False):
-        self.pylogic = pylogics
+    def __init__(self, type="NSFL", sig_gate=False):
         # Significance-gated conjunctive correction (--sig_gate). Off by default,
         # in which case AND2/AND3 scoring in evaluate_fuzzy_nsfl_clean is
         # bit-identical to before this flag existed. See run_query_rescoring_docids
         # for where the per-query pool statistic (sigma_K) is computed.
         self.sig_gate = sig_gate
         self._sig_gate_sigma_K = None
-        if self.pylogic:
-            self.parser = parse_ltl
-            self.evaluator = evaluate_ltl       
+        if type=="GEOMETRIC" or type=="GEO":
+            self.evaluator = self.evaluate_fuzzy_geometric
+        elif type=="NSFL":
+            self.evaluator = self.evaluate_fuzzy_nsfl_clean
         else:
-            if type=="GEOMETRIC" or type=="GEO":
-                self.evaluator = self.evaluate_fuzzy_geometric
-            elif type=="NSFL":
-                self.evaluator = self.evaluate_fuzzy_nsfl_clean
-            else:
-                self.evaluator = self.evaluate_fuzzy_nsfl_debug
+            self.evaluator = self.evaluate_fuzzy_nsfl_debug
 
 
     def evaluate_fuzzy_geometric(self, monolithic_score, atomic_scores, formula, question_embed, query_embeds, target_doc_embeds, normalized_atomic_scores):  
@@ -900,23 +892,11 @@ class FuzzyLogic:
         new_pos_rank = 0
         new_neg_rank = 0
         #query_documents_scores = softmax(query_documents_scores, axis=0)  # Normalize the scores
-        if self.pylogic:
-            f_parsed = self.parser(formulas[formula])
         for doc_id, (monolithic_score, atomic_score) in enumerate(zip(monolithic_scores, query_documents_scores)):
             query = {}
             orig_score = monolithic_score[0]
             #atomic_score = softmax(atomic_score, axis=0)  # Normalize the atomic scores
-            if self.pylogic:
-                # For each atomic score, we create a query with the corresponding atom
-                # and its score, if the atom is in the formula
-                for score, atom in zip(atomic_score, atoms_list):
-                    if atom in formulas[formula]:
-                        query[atom] = score
-                reset_cache()
-                new_score = self.evaluator(f_parsed ,0,[query])
-            else:
-                # If not using pylogics, we assume a simple linear combination of scores
-                new_score = self.evaluator(orig_score, atomic_score, formulas[formula])
+            new_score = self.evaluator(orig_score, atomic_score, formulas[formula])
             
             orig_scores.append(orig_score)
             new_scores.append(new_score)
@@ -1009,8 +989,6 @@ class FuzzyLogic:
         new_pos_rank = 0
         new_neg_rank = 0
         #query_documents_scores = softmax(query_documents_scores, axis=0)  # Normalize the scores
-        if self.pylogic:
-            f_parsed = self.parser(formulas[formula])
 
         
         # Compute per-atom min and max scores across all documents for normalization
@@ -1057,11 +1035,6 @@ class FuzzyLogic:
             query = {}
             orig_score = monolithic_score[0]
             #atomic_score = softmax(atomic_score, axis=0)  # Normalize the atomic scores
-            if self.pylogic:
-                for score, atom in zip(atomic_scores, atoms_list):
-                    if atom in formulas[formula]:
-                        query[atom] = score
-                reset_cache()
             
             # Normalized scores:
             normalized_atomic_scores = np.array([
@@ -1072,10 +1045,7 @@ class FuzzyLogic:
                     for score, atom in zip(atomic_scores, atoms_list)
                 ])
 
-            if self.pylogic:
-                new_score = self.evaluator(f_parsed ,0,[query])
-            else:
-                new_score = self.evaluator(monolithic_score, atomic_scores, formulas[formula], question_embed, query_atoms_embeds, target_doc_embed, normalized_atomic_scores)
+            new_score = self.evaluator(monolithic_score, atomic_scores, formulas[formula], question_embed, query_atoms_embeds, target_doc_embed, normalized_atomic_scores)
             orig_scores.append(orig_score)
             # if new_score.dtype!='float32':
             #     new_score = new_score.numpy()

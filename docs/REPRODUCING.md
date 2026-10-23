@@ -73,27 +73,26 @@ NevIR numbers use the dataset's `test` split (1,383 pairs).
 Differences in the third or fourth decimal place from the paper are expected from
 these sources. Differences larger than that are not, and are worth an issue.
 
-## Known gaps in the code package
+## Differences from `supplementary/`
 
-Found while preparing this repository; the code was not changed.
+`supplementary/` is the OpenReview upload, unmodified. `src/` and `experiments/` are the
+same code with these removals only (no numerical logic changed):
 
-- `src/fuzzy_logic.py` imports `pylogics.semantics.ltl.evaluate_ltl` (plus
-  `reset_cache`, `print_cache`, `eval_cache`). These do not exist in the PyPI
-  `pylogics` (0.2.1). The authors used a locally modified copy, which is not in this
-  repository. Until it is added, `retrieve_fuzzy*.py` cannot be imported from a clean
-  environment. The NevIR quick start does not depend on it.
-- `src/utils/query_builder.py` was missing from the supplementary package and has
-  been added from the project tree (unmodified).
-- Import check from a fresh clone: with `requirements.txt` installed, `evaluate`, `evaluate_nevir`,
-  `baseline_tnorms`, `validate_conjectures`, `fusion_selection` and `sqo_seed_variance` print `--help`;
-  `retrieve_fuzzy*.py`, `fuzzy_logic`, `models.models` and `classifiers.nsfl_base` fail only on the
-  missing `pylogics` fork above.
-- `retrieve_fuzzy.py` also imports `openvino` and `optimum.intel`, which are not
-  listed in the supplementary README's `pip install` line.
-- `src/classifiers/nsfl_base.py` references `experiments.fuzzy_logic.classifiers.nsfl_utils`
-  (`stable_prune_gt_matrix`), which is not shipped.
-- Several flags in `supplementary/README.md` do not match the scripts:
-  `validate_conjectures.py` takes `--score_dump` (not `--scores_path`),
-  `evaluate_nevir.py` takes `--encoder` (not `--queries_path`), and
-  `baseline_tnorms.py` requires `--score_dump` and `--name`. The top-level README
-  uses the scripts' actual flags.
+- The unused `pylogics` linear-temporal-logic path in `src/fuzzy_logic.py` (the
+  `pylogics=True` constructor option and its imports). Both drivers always constructed
+  `FuzzyLogic(pylogics=False, ...)`, so that path never executed; the `pylogics=False`
+  argument was dropped from the two call sites accordingly.
+- An unused `query_parser` import in `src/fuzzy_logic.py`.
+- The optional OpenVINO / Intel-XPU encoding path (`openvino`, `optimum-intel`): the
+  `use_openvino` branches in `src/models/models.py` and the OpenVINO branch of the text
+  encoder wrapper in `experiments/retrieve_fuzzy.py`, which is now named `SentenceEncoder`
+  and always delegates to `SentenceTransformer`. The removed branches only ran when the
+  torch device was `xpu`.
+- `src/classifiers/nsfl_base.py` reduced to the encoder interfaces (`IEncoder`,
+  `ITextEncoder`, `IImageEncoder`, `IImageTextEncoder`); its dataset/strategy classes were
+  never used by any driver.
+
+Flags in `supplementary/README.md` that do not match the scripts (the top-level README uses
+the scripts' actual flags): `validate_conjectures.py` takes `--score_dump` (not
+`--scores_path`), `evaluate_nevir.py` takes `--encoder` (not `--queries_path`), and
+`baseline_tnorms.py` requires `--score_dump` and `--name`.
