@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# data payloads and caches (only data/README.md is tracked)
+data/*
+!data/README.md
+logic_demo/
+debug_out/
+*.npy
+*.pt
+*.pth
+*.faiss
+*.pkl
+*.tsv
+nevir_results.json

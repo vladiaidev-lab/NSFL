@@ -1,0 +1,17 @@
+# Versions below resolved together (pip check clean) on Python 3.12.3, CPU.
+# The text-to-text / image-to-text pipelines (experiments/retrieve_fuzzy*.py) additionally
+# need openvino, optimum[openvino] and the modified `pylogics` fork -- see docs/REPRODUCING.md.
+torch==2.14.1
+sentence-transformers==6.2.0
+transformers==5.20.2
+datasets==5.1.0
+numpy==2.5.4
+scipy==1.18.1
+pandas==3.1.0
+scikit-learn==1.9.1
+faiss-cpu==1.15.1
+geoopt==0.5.1
+jaxtyping==0.3.11
+jax==0.12.0.1
+Pillow==13.0.0
+requests==2.34.2
