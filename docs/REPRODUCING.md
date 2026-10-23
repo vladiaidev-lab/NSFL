@@ -3,13 +3,6 @@
 Details that the top-level README does not carry. Run every command from the
 repository root with `PYTHONPATH=src` (see README, Installation).
 
-<!-- Values marked "TODO: confirm" were not recorded in the package and must be filled in by the author. -->
-
-## Hardware and runtime
-
-- GPU model / memory used for the paper: TODO: confirm
-- Per-experiment runtimes: TODO: confirm
-
 ## Encoders
 
 Six encoder configurations are used (four text, two vision-language). Model
@@ -29,15 +22,14 @@ released with this repository, so this encoder's rows cannot be reproduced from 
 other encoders are public Hugging Face models.
 
 Revisions are **not pinned** in the code: `from_pretrained` / `SentenceTransformer`
-resolve to the latest revision unless a local copy is supplied. Exact revisions used
-for the paper: TODO: confirm.
+resolve to the latest revision unless a local copy is supplied.
 
 ## Embeddings and caching
 
 - QUEST/COCO-LOGIC corpora are embedded once into prebuilt FAISS indices
   (`logic_demo/QUEST/faiss_quest_*`, `logic_demo/COCO-LOGIC/faiss_coco_val_*`).
   If an index is absent it is rebuilt on first run (`--rebuild_index`); this is
-  the dominant cost. Disk usage per index: TODO: confirm.
+  the dominant cost.
 - `evaluate_nevir.py` caches query/document embeddings as pickles under
   `logic_demo/NevIR/<encoder>/`, and the dataset under `logic_demo/NevIR/dataset`.
 
@@ -55,8 +47,7 @@ Defaults in `experiments/retrieve_fuzzy.py`:
 | `--sqo_n_restarts` | 1 | SQO restarts |
 | `--sig_gate` | 0 | significance-gated conjunction (Appendix I, not used for reported results) |
 
-The K ablation (Table 17) sweeps `--topk_max` over {100, 200, 500, 1000}. Values
-of per-run overrides used for each reported table: TODO: confirm.
+The K ablation (Table 17) sweeps `--topk_max` over {100, 200, 500, 1000}.
 
 ## Splits
 

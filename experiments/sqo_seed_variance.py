@@ -266,22 +266,6 @@ def run_seed_variance_analysis(
     return results
 
 
-def run_with_real_embeddings(
-    model_name: str,
-    queries_path: str,
-    n_queries: int = 100,
-    n_seeds: int = 5,
-):
-    """
-    Run seed variance analysis with real embeddings from your encoder.
-    
-    This function should be adapted to your specific embedding setup.
-    """
-    # TODO: Implement with your actual embedding loading code
-    # This would load real query embeddings and run SQO on them
-    pass
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="SQO Seed Variance Analysis")
     parser.add_argument("--n_queries", type=int, default=100)

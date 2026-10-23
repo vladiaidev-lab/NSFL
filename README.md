@@ -40,7 +40,7 @@ pip install --extra-index-url https://download.pytorch.org/whl/cpu -r requiremen
 
 ## Quick start
 
-NevIR with `BAAI/bge-large-en-v1.5` (Table 14). The dataset and model are downloaded automatically; no manual data setup is needed. Embeddings are cached under `logic_demo/NevIR/`. Runtime on a GPU: TODO: confirm.
+NevIR with `BAAI/bge-large-en-v1.5` (Table 14). The dataset and model are downloaded automatically; no manual data setup is needed. Embeddings are cached under `logic_demo/NevIR/`.
 
 ```bash
 PYTHONPATH=src python experiments/evaluate_nevir.py --encoder BAAI/bge-large-en-v1.5 --output debug_out/retrieval/nevir_bge.json
