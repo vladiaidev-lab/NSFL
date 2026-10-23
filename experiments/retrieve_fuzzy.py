@@ -387,12 +387,6 @@ def get_fuzzy_evalset_queries(    eval_data  ):
 #         model_kwargs = None
     
 #     ###query_encoder = SentenceTransformer(args.query_encoder, device="cuda", model_kwargs=model_kwargs, trust_remote_code=True)
-#     query_encoder = OpenVINOSentenceEncoder(
-#             args.query_encoder,
-#             device=device,
-#             model_kwargs=model_kwargs,
-#             trust_remote_code=True,
-#         )
     
 
 #     #eval_qid2query, eval_qid2docids = get_fuzzy_evalset(queries, return_negatives=True, fuzzy=fuzzy)

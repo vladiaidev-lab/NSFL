@@ -19,9 +19,14 @@ identifiers that appear in the code or its README:
 |---|---|
 | BGE | `BAAI/bge-large-en-v1.5` |
 | E5 | `intfloat/e5-base-v2` |
-| LogiCoL-E5 | local path `models--...LogiCoL...` (fine-tuned E5; source: TODO: confirm) |
+| LogiCoL-E5-v2 | not a public model; see the note below |
 | Nomic | `nomic-ai/nomic-embed-text-v2-moe` |
 | BLIP-Large, SigLIP | loaded through `transformers` (`models/models.py`) |
+
+LogiCoL published the method, not weights. The LogiCoL-E5-v2 encoder used in the paper is the
+authors' own implementation of that method applied to E5, trained locally. No checkpoint is
+released with this repository, so this encoder's rows cannot be reproduced from a download. All
+other encoders are public Hugging Face models.
 
 Revisions are **not pinned** in the code: `from_pretrained` / `SentenceTransformer`
 resolve to the latest revision unless a local copy is supplied. Exact revisions used
