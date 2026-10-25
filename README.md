@@ -55,7 +55,7 @@ The commands below are taken from the supplementary package (flags checked again
 | Paper item | Command |
 |---|---|
 | Table 4 (QUEST) | `python experiments/retrieve_fuzzy.py ... --is_decompose=1 --fuzzy_type=NSFL --augment_type=QUEST`, then `python experiments/evaluate.py --queries_path=... --results_file=...` |
-| Table 4 (COCO-LOGIC) | `python experiments/retrieve_fuzzy_blip_siglip_vv.py --model_name=blip-large\|siglip --is_decompose=1 --augment_type=QUEST`, then `experiments/evaluate.py` |
+| Table 4 (COCO-LOGIC) | `python experiments/retrieve_fuzzy_blip_siglip_vv.py --model_name=blip-large\|siglip --images_path=<dir containing val/> --is_decompose=1 --augment_type=QUEST`, then `python experiments/evaluate.py --queries_path=data/coco_logic_600_val_quest_style.json --results_file=...` |
 | Table 5 (t-norm baselines) | `python experiments/baseline_tnorms.py --score_dump=... --name=...` |
 | Table 6, SQO ablation | add `--is_opt_onsphere=1` to the Table 4 commands |
 | Tables 9–10 | `retrieve_fuzzy.py ... --dump_scores_path=...`, then `python experiments/validate_conjectures.py --score_dump=...` |

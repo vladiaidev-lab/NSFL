@@ -53,7 +53,7 @@ The K ablation (Table 17) sweeps `--topk_max` over {100, 200, 500, 1000}.
 
 QUEST: `val_corpus_no_neg_fixed.jsonl` is the validation split (used for fusion
 selection, Tables 15-16); `test_corpus_no_neg_fixed.jsonl` is the test split and
-the source of all reported numbers. COCO-LOGIC has no held-out split. The query files shipped in `data/` are the exact ones used for the published results, so the COCO-LOGIC numbers are reproducible given the COCO-2017 validation images. The scripts also read the image corpus list `logic_demo/COCO-LOGIC/coco_corpus_val.json`, which is not part of this release.
+the source of all reported numbers. COCO-LOGIC has no held-out split. The query files shipped in `data/` are the exact ones used for the published results, so COCO-LOGIC is fully reproducible given a local copy of the COCO-2017 validation images. The image corpus list that `passage_id` indexes into is shipped as `data/coco_corpus_5000_val.json`; point `--images_path` at a folder that contains the images under `val/`.
 NevIR numbers use the dataset's `test` split (1,383 pairs).
 
 ## Known sources of small numerical variation
@@ -88,7 +88,31 @@ same code with these removals only (no numerical logic changed):
   `ITextEncoder`, `IImageEncoder`, `IImageTextEncoder`); its dataset/strategy classes were
   never used by any driver.
 
+Path handling also changed for the released COCO-LOGIC data (no scoring, ranking or evaluation
+logic touched):
+
+- `experiments/retrieve_fuzzy_blip_siglip_vv.py` now defaults to `data/coco_logic_600_val_{quest_style|simple}.json`
+  (chosen by `--augment_type`) and `data/coco_corpus_5000_val.json`, builds its folder and image
+  paths with `os.path.join` instead of Windows backslashes, and decides between local files and
+  URLs by an explicit `http(s)://` check on `--images_path` (the old `'\\' in images_path` test
+  was always true, because a backslash was always appended).
+- `experiments/retrieve_fuzzy.py` recognises the renamed COCO-LOGIC query files when it derives a
+  cache filename.
+- The released query and corpus files hold bare image filenames instead of absolute paths of
+  the authors' machine.
+
 Flags in `supplementary/README.md` that do not match the scripts (the top-level README uses
 the scripts' actual flags): `validate_conjectures.py` takes `--score_dump` (not
 `--scores_path`), `evaluate_nevir.py` takes `--encoder` (not `--queries_path`), and
 `baseline_tnorms.py` requires `--score_dump` and `--name`.
+
+## Known issues
+
+- **Shared query-cache filename (`experiments/retrieve_fuzzy.py`).** When it is given a
+  COCO-LOGIC query file, both fusion branches of `load_queries_embeddings` build the same
+  cache name, `filtered_100_from_all_coco2017_VAL(augment-simple).pkl`. Running Simple and
+  Contextual (QUEST-style) fusion against one cache directory (`--saved_queries_path`) can
+  therefore load cached query embeddings from the other fusion type. Workaround: use a
+  separate cache directory per fusion type, or clear the cache between runs. The code is
+  left as released. `experiments/retrieve_fuzzy_blip_siglip_vv.py` names its cache by
+  augment type and is not affected.

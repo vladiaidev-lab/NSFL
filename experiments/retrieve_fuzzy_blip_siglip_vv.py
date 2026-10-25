@@ -44,11 +44,11 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", type=str, default="coco", help="Coco / Quest / ?")
     parser.add_argument("--subdataset", type=str, default="val", help="val / test / train")
-    parser.add_argument("--default_path", type=str, default="logic_demo\\COCO-LOGIC\\", help="Folder of queries, data, index")
-    parser.add_argument("--images_path", type=str, default="logic_demo/COCO2017/", help="Images path")
+    parser.add_argument("--default_path", type=str, default="logic_demo/COCO-LOGIC", help="Folder of queries, data, index")
+    parser.add_argument("--images_path", type=str, default="logic_demo/COCO2017/", help="Folder holding the COCO-2017 images; images are read from <images_path>/<subdataset>/ (e.g. <images_path>/val/000000212226.jpg).")
     parser.add_argument("--model_name", type=str, default='blip-large', help="Blip or Siglip.")
     parser.add_argument("--augment_type", type=str, default="QUEST", help="QUEST (that are also...) / SIMPLE (only 'AND')")
-    parser.add_argument("--input_path", type=str, default=None, help="Path to images list as documents. If None, constructed from dataset/subdataset.")
+    parser.add_argument("--input_path", type=str, default=None, help="Path to images list as documents. If None, defaults to data/coco_corpus_5000_<subdataset>.json.")
     parser.add_argument("--queries_path", type=str, default=None, help="Path to the queries file. If None, defaults to data/coco_logic_600_<subdataset>_{quest_style|simple}.json, chosen by --augment_type.")
     
     parser.add_argument("--topk", type=int, default=100, help="Number of documents to retrieve per query.")
@@ -86,10 +86,10 @@ def parse_args():
                              "'atom0 & atom1 & atom2'.")
 
     args = parser.parse_args()
-    args.images_path = f"{args.images_path}{args.subdataset}\\"
+    args.images_path = os.path.join(args.images_path, args.subdataset)
     
     if args.input_path is None:
-        args.input_path = f"{args.default_path}{args.dataset}_corpus_{args.subdataset}.json"
+        args.input_path = os.path.join("data", f"coco_corpus_5000_{args.subdataset}.json")
     if args.queries_path is None:
         coco_logic_realization = {"QUEST": "quest_style", "SIMPLE": "simple"}[args.augment_type.upper()]
         args.queries_path = f"data/coco_logic_600_{args.subdataset}_{coco_logic_realization}.json"
@@ -97,14 +97,14 @@ def parse_args():
     if (('blip' in args.model_name) or ('siglip' in args.model_name)):
         if ('blip' in args.model_name):
             if ('large' in args.model_name):
-                args.faiss_data_path = f"{args.default_path}faiss_{args.dataset}_{args.subdataset}_blip_large"                
+                args.faiss_data_path = os.path.join(args.default_path, f"faiss_{args.dataset}_{args.subdataset}_blip_large")                
             else:
-                args.faiss_data_path = f"{args.default_path}faiss_{args.dataset}_{args.subdataset}_blip_base"
+                args.faiss_data_path = os.path.join(args.default_path, f"faiss_{args.dataset}_{args.subdataset}_blip_base")
         elif ('siglip' in args.model_name):
-            args.faiss_data_path = f"{args.default_path}faiss_{args.dataset}_{args.subdataset}_{args.model_name}"
+            args.faiss_data_path = os.path.join(args.default_path, f"faiss_{args.dataset}_{args.subdataset}_{args.model_name}")
         
         
-    args.saved_queries_path = args.faiss_data_path + '\\'
+    args.saved_queries_path = args.faiss_data_path
     return args
 
 
@@ -122,7 +122,7 @@ def load_document_embeddings(documents_file, is_encode_all):
             dict_docids_img[str(i)] = item["image"]
 
     if is_encode_all:  
-        image_list = [args.images_path + item['title'] for item in data]
+        image_list = [os.path.join(args.images_path, item['title']) for item in data]
         
         batch_size = args.batch_size
         number_of_images = len(image_list)
@@ -133,7 +133,7 @@ def load_document_embeddings(documents_file, is_encode_all):
             images_per_batch = min(batch_size, number_of_images-i)
             images = image_list[i:i+images_per_batch]
             print(image_list[i:i+images_per_batch])
-            if ('\\' in args.images_path):
+            if not args.images_path.startswith(("http://", "https://")):
                 images = [Image.open(image) for image in images]
             else:
                 images = [Image.open(requests.get(image, stream=True).raw) for image in images]

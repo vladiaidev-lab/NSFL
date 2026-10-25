@@ -14,6 +14,7 @@ data/*
 !data/README.md
 !data/coco_logic_600_val_quest_style.json
 !data/coco_logic_600_val_simple.json
+!data/coco_corpus_5000_val.json
 logic_demo/
 debug_out/
 *.npy
