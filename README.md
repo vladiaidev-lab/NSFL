@@ -14,7 +14,7 @@ Standard dense retrievers have no native mechanism for multi-atom logical constr
 
 ## What this repository contains
 
-Code for the NSFL operators and scoring, Spherical Query Optimization (SQO), and the evaluation drivers for QUEST, COCO-LOGIC and NevIR. `supplementary/` is the code package exactly as uploaded to OpenReview for review; `src/` and `experiments/` contain the same files regrouped (library modules vs. drivers), with only unused code removed (see `docs/REPRODUCING.md`). COCO-LOGIC (queries, ground truth and image list) is included in `data/`; QUEST and NevIR are obtained from their sources.
+Code for the NSFL operators and scoring, Spherical Query Optimization (SQO), and the evaluation drivers for QUEST, COCO-LOGIC and NevIR. `supplementary/` is the code package exactly as uploaded to OpenReview for review; `src/` and `experiments/` contain the same files regrouped (library modules vs. drivers), with unused code removed and COCO-LOGIC paths updated (see `docs/REPRODUCING.md`). COCO-LOGIC (queries, ground truth and image list) is included in `data/`; QUEST and NevIR are obtained from their sources.
 
 ```
 .
@@ -54,7 +54,7 @@ Expected: `overall` accuracy of 0.611 (baseline) and 0.717 (NSFL), as reported i
 
 ## Reproducing the paper's results
 
-The commands below are taken from the supplementary package (flags checked against each script's argument parser) and need the QUEST / COCO-LOGIC data (see Datasets); details in [`docs/REPRODUCING.md`](docs/REPRODUCING.md). Run from the repository root with `PYTHONPATH=src`; the scripts expect a `logic_demo/` directory (layout in `supplementary/README.md` §3).
+The commands below are taken from the supplementary package (flags checked against each script's argument parser) and need the QUEST data and the COCO-2017 val images (see Datasets); details in [`docs/REPRODUCING.md`](docs/REPRODUCING.md). Run from the repository root with `PYTHONPATH=src`; the scripts expect a `logic_demo/` directory, which is still needed for the FAISS indices, the COCO images, QUEST and NevIR (layout in `supplementary/README.md` §3). The COCO-LOGIC query and corpus files are read from `data/`, not from `logic_demo/COCO-LOGIC/` as that layout describes.
 
 | Paper item | Command |
 |---|---|
@@ -72,10 +72,10 @@ The commands below are taken from the supplementary package (flags checked again
 ## Datasets
 
 - **QUEST** — obtained from its source, not redistributed; see [`data/README.md`](data/README.md).
-- **COCO-LOGIC** — released with the paper and shipped with this repository in [`data/`](data/) (queries and ground truth only, CC BY 4.0); the images come from COCO-2017 val.
+- **COCO-LOGIC** — released with the paper and shipped with this repository in [`data/`](data/). The query set and ground truth are released under CC BY 4.0. The image corpus list is a re-formatted listing of COCO-2017 validation filenames, provided for convenience. The images come from COCO-2017 val.
 - **NevIR** — obtained from its source: downloaded automatically from Hugging Face on first run.
 
-The MIT license covers the code only. The COCO-LOGIC query set is released under CC BY 4.0; QUEST and NevIR keep their own licenses (see `data/README.md`).
+The MIT license covers the code only. The COCO-LOGIC query set and ground truth are released under CC BY 4.0. The image corpus list contains no original content and is covered by [COCO's terms of use](https://cocodataset.org/#termsofuse). QUEST and NevIR keep their own licenses (see `data/README.md`).
 
 ## Citation
 
