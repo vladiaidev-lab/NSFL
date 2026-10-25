@@ -4,9 +4,9 @@
 <!-- TODO: replace with https://jmlr.org/tmlr/papers/... once published -->
 [TMLR paper](TMLR_URL_PLACEHOLDER) · [OpenReview](https://openreview.net/forum?id=WYpsWBabCu)
 
-**Authors:** Vladi Vexler\*, Ofer Idan, Gil Lederman, Dima Sivov, Lei Zhou
+**Authors:** Vladi Vexler\*, Ofer Idan, Gil Lederman, Dima Sivov
 **Affiliation:** Huawei Tel-Aviv Research Center
-\*Corresponding author: `vladi dot vexler at huawei dot com`
+\*Corresponding author: vladi dot vexler at huawei dot com
 
 ## Abstract
 
