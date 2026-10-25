@@ -68,10 +68,10 @@ The commands below are taken from the supplementary package (flags checked again
 ## Datasets
 
 - **QUEST** — external, not redistributed; see [`data/README.md`](data/README.md).
-- **COCO-LOGIC** — released with the paper, derived from COCO-2017 val; not redistributed in this repository.
+- **COCO-LOGIC** — released with the paper, derived from COCO-2017 val. This repository redistributes the query set (queries and ground truth only) under CC BY 4.0; the images come from COCO.
 - **NevIR** — external, downloaded automatically from Hugging Face on first run.
 
-The MIT license covers the code only; each dataset keeps its own license (see `data/README.md`).
+The MIT license covers the code only. The COCO-LOGIC query set is released under CC BY 4.0; QUEST and NevIR keep their own licenses (see `data/README.md`).
 
 ## Citation
 
