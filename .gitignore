@@ -12,6 +12,8 @@ Thumbs.db
 # data payloads and caches (only data/README.md is tracked)
 data/*
 !data/README.md
+!data/coco_logic_600_val_quest_style.json
+!data/coco_logic_600_val_simple.json
 logic_demo/
 debug_out/
 *.npy

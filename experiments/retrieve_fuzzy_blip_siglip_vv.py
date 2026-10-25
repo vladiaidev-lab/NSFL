@@ -49,7 +49,7 @@ def parse_args():
     parser.add_argument("--model_name", type=str, default='blip-large', help="Blip or Siglip.")
     parser.add_argument("--augment_type", type=str, default="QUEST", help="QUEST (that are also...) / SIMPLE (only 'AND')")
     parser.add_argument("--input_path", type=str, default=None, help="Path to images list as documents. If None, constructed from dataset/subdataset.")
-    parser.add_argument("--queries_path", type=str, default=None, help="Path to the queries file. If None, constructed from dataset/subdataset/augment.")
+    parser.add_argument("--queries_path", type=str, default=None, help="Path to the queries file. If None, defaults to data/coco_logic_600_<subdataset>_{quest_style|simple}.json, chosen by --augment_type.")
     
     parser.add_argument("--topk", type=int, default=100, help="Number of documents to retrieve per query.")
     parser.add_argument("--topk_max", type=int, default=1000, help="Number of documents to retrieve per query.")
@@ -91,7 +91,8 @@ def parse_args():
     if args.input_path is None:
         args.input_path = f"{args.default_path}{args.dataset}_corpus_{args.subdataset}.json"
     if args.queries_path is None:
-        args.queries_path = f"{args.default_path}{args.dataset}_queries_600_{args.subdataset}_(augment-{args.augment_type}).json"
+        coco_logic_realization = {"QUEST": "quest_style", "SIMPLE": "simple"}[args.augment_type.upper()]
+        args.queries_path = f"data/coco_logic_600_{args.subdataset}_{coco_logic_realization}.json"
 
     if (('blip' in args.model_name) or ('siglip' in args.model_name)):
         if ('blip' in args.model_name):

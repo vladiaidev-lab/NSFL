@@ -53,7 +53,7 @@ The K ablation (Table 17) sweeps `--topk_max` over {100, 200, 500, 1000}.
 
 QUEST: `val_corpus_no_neg_fixed.jsonl` is the validation split (used for fusion
 selection, Tables 15-16); `test_corpus_no_neg_fixed.jsonl` is the test split and
-the source of all reported numbers. COCO-LOGIC has no held-out split.
+the source of all reported numbers. COCO-LOGIC has no held-out split. The query files shipped in `data/` are the exact ones used for the published results, so the COCO-LOGIC numbers are reproducible given the COCO-2017 validation images. The scripts also read the image corpus list `logic_demo/COCO-LOGIC/coco_corpus_val.json`, which is not part of this release.
 NevIR numbers use the dataset's `test` split (1,383 pairs).
 
 ## Known sources of small numerical variation

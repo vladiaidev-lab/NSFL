@@ -503,7 +503,7 @@ def load_queries_embeddings(saved_queries_path, query_encoder, questions, qids, 
             queries_saved_file = os.path.join(saved_queries_path, "quest_debug(augment-quest).pkl") if saved_queries_path is not None else None
         else:
             queries_saved_file = os.path.join(saved_queries_path, "quest_debug(augment-simple).pkl") if saved_queries_path is not None else None
-    elif 'filtered_100_from_all_coco2017_VAL' in queries_path:
+    elif 'coco_logic_600_val' in queries_path:
         if args.augment_type.upper() == "QUEST":
             queries_saved_file = os.path.join(saved_queries_path, "filtered_100_from_all_coco2017_VAL(augment-simple).pkl") if saved_queries_path is not None else None
         else:
