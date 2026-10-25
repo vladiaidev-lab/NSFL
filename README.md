@@ -93,6 +93,7 @@ The MIT license covers the code only. The COCO-LOGIC query set and ground truth 
 ## License
 
 <!-- TODO: LICENSE pending legal review; may be replaced -->
+<!-- TODO: licensor / copyright holder "Huawei Technologies Co., Ltd." pending confirmation -->
 See [`LICENSE`](LICENSE) (MIT).
 
 ## Acknowledgments

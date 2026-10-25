@@ -4,6 +4,7 @@ This repository redistributes one dataset, COCO-LOGIC: the query set, its ground
 image corpus list. The images themselves come from COCO. QUEST and NevIR are obtained from
 their original sources.
 
+<!-- TODO: licensor / copyright holder "Huawei Technologies Co., Ltd." pending confirmation -->
 The MIT license in the repository root covers the code only. The COCO-LOGIC query set and
 ground truth are released under CC BY 4.0 (licence text and attribution in [`LICENSE`](LICENSE)
 in this directory, which covers those files only). The image corpus list (`coco_corpus_5000_val.json`)

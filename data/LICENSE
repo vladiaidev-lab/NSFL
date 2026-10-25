@@ -13,6 +13,8 @@ which remains under COCO's own terms (https://cocodataset.org/#termsofuse). It d
 apply to the code in this repository, which is under the MIT licence in ../LICENSE, nor to
 COCO images or annotations, nor to QUEST or NevIR.
 
+Licensor. The licensor of this grant is Huawei Technologies Co., Ltd.
+
 Attribution. If you use the COCO-LOGIC query set or ground truth, credit it as:
 
     Vladi Vexler, Ofer Idan, Gil Lederman and Dima Sivov, "NSFL: A Post-Training
