@@ -10,8 +10,6 @@ authors:
     given-names: Gil
   - family-names: Sivov
     given-names: Dima
-  - family-names: Zhou
-    given-names: Lei
 license: MIT
 repository-code: "https://github.com/vladiaidev-lab/NSFL"
 preferred-citation:
@@ -26,8 +24,6 @@ preferred-citation:
       given-names: Gil
     - family-names: Sivov
       given-names: Dima
-    - family-names: Zhou
-      given-names: Lei
   journal: "Transactions on Machine Learning Research"
   issn: "2835-8856"
   year: 2026

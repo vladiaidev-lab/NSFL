@@ -78,7 +78,7 @@ The MIT license covers the code only; each dataset keeps its own license (see `d
 ```bibtex
 @article{vexler2026nsfl,
   title   = {{NSFL}: A Post-Training Neuro-Symbolic Fuzzy Logic Framework for Boolean Operators in Neural Embeddings},
-  author  = {Vexler, Vladi and Idan, Ofer and Lederman, Gil and Sivov, Dima and Zhou, Lei},
+  author  = {Vexler, Vladi and Idan, Ofer and Lederman, Gil and Sivov, Dima},
   journal = {Transactions on Machine Learning Research},
   issn    = {2835-8856},
   year    = {2026},
