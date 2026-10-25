@@ -14,7 +14,7 @@ Standard dense retrievers have no native mechanism for multi-atom logical constr
 
 ## What this repository contains
 
-Code for the NSFL operators and scoring, Spherical Query Optimization (SQO), and the evaluation drivers for QUEST, COCO-LOGIC and NevIR. `supplementary/` is the code package exactly as uploaded to OpenReview for review; `src/` and `experiments/` contain the same files regrouped (library modules vs. drivers), with only unused code removed (see `docs/REPRODUCING.md`). No dataset is redistributed.
+Code for the NSFL operators and scoring, Spherical Query Optimization (SQO), and the evaluation drivers for QUEST, COCO-LOGIC and NevIR. `supplementary/` is the code package exactly as uploaded to OpenReview for review; `src/` and `experiments/` contain the same files regrouped (library modules vs. drivers), with only unused code removed (see `docs/REPRODUCING.md`). COCO-LOGIC (queries, ground truth and image list) is included in `data/`; QUEST and NevIR are obtained from their sources.
 
 ```
 .
@@ -24,7 +24,11 @@ Code for the NSFL operators and scoring, Spherical Query Optimization (SQO), and
 │   ├── models/  classifiers/
 ├── experiments/         # retrieval / evaluation drivers (retrieve_fuzzy*.py, evaluate*.py, ...)
 ├── supplementary/       # the OpenReview supplementary package, unmodified
-├── data/README.md       # how to obtain the datasets
+├── data/                # COCO-LOGIC (shipped); how to obtain QUEST and NevIR
+│   ├── README.md
+│   ├── coco_logic_600_val_quest_style.json
+│   ├── coco_logic_600_val_simple.json
+│   └── coco_corpus_5000_val.json
 └── docs/REPRODUCING.md  # hardware, hyperparameters, splits, numerical variation
 ```
 
