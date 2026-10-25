@@ -72,10 +72,10 @@ The commands below are taken from the supplementary package (flags checked again
 ## Datasets
 
 - **QUEST** — obtained from its source, not redistributed; see [`data/README.md`](data/README.md).
-- **COCO-LOGIC** — released with the paper and shipped with this repository in [`data/`](data/). The query set and ground truth are released under CC BY 4.0. The image corpus list is a re-formatted listing of COCO-2017 validation filenames, provided for convenience. The images come from COCO-2017 val.
+- **COCO-LOGIC** — released with the paper and shipped with this repository in [`data/`](data/). The query set and ground truth are released under CC BY 4.0 (see [`data/LICENSE`](data/LICENSE)). The image corpus list is a re-formatted listing of COCO-2017 validation filenames, provided for convenience. The images come from COCO-2017 val.
 - **NevIR** — obtained from its source: downloaded automatically from Hugging Face on first run.
 
-The MIT license covers the code only. The COCO-LOGIC query set and ground truth are released under CC BY 4.0. The image corpus list contains no original content and is covered by [COCO's terms of use](https://cocodataset.org/#termsofuse). QUEST and NevIR keep their own licenses (see `data/README.md`).
+The MIT license covers the code only. The COCO-LOGIC query set and ground truth are released under CC BY 4.0 ([`data/LICENSE`](data/LICENSE)). The image corpus list contains no original content and is covered by [COCO's terms of use](https://cocodataset.org/#termsofuse). QUEST and NevIR keep their own licenses (see `data/README.md`).
 
 ## Citation
 

@@ -5,7 +5,8 @@ image corpus list. The images themselves come from COCO. QUEST and NevIR are obt
 their original sources.
 
 The MIT license in the repository root covers the code only. The COCO-LOGIC query set and
-ground truth are released under CC BY 4.0. The image corpus list (`coco_corpus_5000_val.json`)
+ground truth are released under CC BY 4.0 (licence text and attribution in [`LICENSE`](LICENSE)
+in this directory, which covers those files only). The image corpus list (`coco_corpus_5000_val.json`)
 is a re-formatted listing of COCO-2017 validation filenames, provided for convenience; it
 contains no original content and is covered by COCO's own terms
 (https://cocodataset.org/#termsofuse). COCO images and annotations are not redistributed and
@@ -45,10 +46,13 @@ and `negative_ctxs` (present, always empty).
 truth and `question_type`. They differ **only** in `original_query`, the surface realization
 of the same logical template; the two disjunctive templates ("A or B", "A or B or C") are
 worded identically in both files, so `original_query` differs for 400 of the 600 queries.
-`question_type` is the template identifier that the code dispatches on to select the
-operator. It is identical across the two files by design: in the simple-fusion file
-`original_query` reads "A and B" while `question_type` still reads `"_ that are also _"`.
-This is correct, not a bug, and `question_type` must not be edited.
+`original_query` is provided for readers: the shipped scripts do not read it, and the fusion
+wording they encode is set by `--augment_type`, so both files give identical inputs to the
+shipped code. `question_type` is the template label used to group queries and report results
+per template; the operator is selected from `atom_formulas`. It is identical across the two
+files by design: in the simple-fusion file `original_query` reads "A and B" while
+`question_type` still reads `"_ that are also _"`. This is correct, not a bug, and
+`question_type` must not be edited, since evaluation filters and reports by it.
 
 | `question_type` | `atom_formulas` |
 |---|---|
@@ -68,7 +72,7 @@ convenience, contains no original content, and is covered by COCO's terms of use
 
 **Ground truth.** `passage_id` in the query files is a **positional index** into the corpus
 list: `corpus[int(passage_id)]["title"]` equals the `answer` of that `positive_ctxs` entry (this
-holds for all 101,001 entries of both query files). The order of the corpus list therefore must
+holds for all entries: 101,001 in each query file, 202,002 in total). The order of the corpus list therefore must
 not be changed: do not sort, deduplicate, filter or reorder it. `answer`, `title` and `image`
 are COCO-2017 val filenames with no directory, to be resolved against a local copy of the
 images; `experiments/retrieve_fuzzy_blip_siglip_vv.py` reads image `<title>` from

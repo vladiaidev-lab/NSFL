@@ -12,6 +12,7 @@ Thumbs.db
 # data payloads and caches (only data/README.md is tracked)
 data/*
 !data/README.md
+!data/LICENSE
 !data/coco_logic_600_val_quest_style.json
 !data/coco_logic_600_val_simple.json
 !data/coco_corpus_5000_val.json
